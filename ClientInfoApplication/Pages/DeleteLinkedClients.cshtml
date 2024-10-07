@@ -1,0 +1,32 @@
+﻿@page
+@using System.Data.SqlClient;
+
+@{
+    // delete client from 'clients_linked' database table
+    try
+    {
+        String clientId = Request.Query["clientId"];
+        String contactId = Request.Query["contactId"];
+
+        String connectionString = "Data Source=.\\sqlexpress;Initial Catalog=myDatabase;Integrated Security=True";
+        using (SqlConnection connection = new SqlConnection(connectionString))
+        {
+            connection.Open();
+
+            String sql = "DELETE FROM clients_linked " +
+                         "WHERE clientId=@clientId AND contactId=contactId";
+            using (SqlCommand command = new SqlCommand(sql, connection))
+            {
+                command.Parameters.AddWithValue("@clientId", clientId);
+                command.Parameters.AddWithValue("@contactId", contactId);
+
+                command.ExecuteNonQuery();
+            }
+        }
+    }
+    catch (Exception ex)
+    {
+
+    }
+    Response.Redirect("/Clients");
+}

@@ -1,0 +1,166 @@
+﻿@page
+@model ClientInfoApplication.Pages.ContactsModel
+@{
+}
+
+<br>
+<h2>New Contact</h2>
+<div class="card ">
+    <!-- contact view header tabs -->
+    <div class="card-header">
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home-tab-pane" type="button" role="tab" aria-controls="home-tab-pane" aria-selected="true">General</button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile-tab-pane" type="button" role="tab" aria-controls="profile-tab-pane" aria-selected="false">Client(s)</button>
+            </li>
+        </ul>
+    </div>
+    <div class="card-body">
+        <div class="tab-content" id="myTabContent">
+            <!-- 'General' header tab content -->
+            <div class="tab-pane fade show active" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">
+                <!-- error message banner displayed when data is not entered correctly -->
+                @if (Model.errorMessage.Length > 0)
+                {
+                    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                        <strong>@Model.errorMessage</strong>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="close"></button>
+                    </div>
+                }
+                <!-- success message banner displayed when data has been correctly entered -->
+                @if (Model.successMessage.Length > 0)
+                {
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <strong>@Model.successMessage</strong>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="close"></button>
+                    </div>
+                }
+
+                <!-- form that allows user to enter new contact info -->
+                <form method="POST" asp-page-handler="CreateContact">
+                    <div class="mb-3">
+                        <label for="name" class="form-label">Name</label>
+                        <input type="text" class="form-control form-control-sm" id="name" name="name" value="@Model.contactInfo.name">
+                    </div>
+                    <div class="mb-3">
+                        <label for="surname" class="form-label">Surname</label>
+                        <input type="text" class="form-control form-control-sm" id="surname" name="surname" value="@Model.contactInfo.surname">
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="text" class="form-control form-control-sm" id="email" name="email" value="@Model.contactInfo.email">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary mx-2">Create Contact</button>
+                    <a class="btn btn-outline-primary mx-2" href="/" role="button">Cancel</a>
+                </form>
+            </div>
+
+            <!-- 'Client(s)' header tab content -->
+            <div class="tab-pane fade" id="profile-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
+                <div class="card">
+                    <div class="card-body">
+                        <!-- form allows to link client to some contacts -->
+                        <h5 class="card-title">Link a client to contact(s)</h5>
+                        <!-- error message banner displayed when data is not entered correctly -->
+                        @if (Model.errorMessage.Length > 0)
+                        {
+                            <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                                <strong>@Model.errorMessage</strong>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="close"></button>
+                            </div>
+                            <!-- Reload the page after a failed entry -->
+                            <script>
+                                // Redirect to show the clients after a few seconds
+                                setTimeout(function() {
+                                    window.location.href = '@Url.Page("Contacts")';
+                                }, 3000); // 3000 milliseconds = 3 seconds
+                            </script>
+                        }
+                        <!-- success message banner displayed when data has been correctly entered -->
+                        @if (Model.successMessage.Length > 0)
+                        {
+                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                <strong>@Model.successMessage</strong>
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="close"></button>
+                            </div>
+                        }
+                        <form method="POST" asp-page-handler="LinkContacts">
+                            <div class="row">
+                                <div class="col px-3">
+                                    <select class="form-select" name="selectedClientId">
+                                        <option selected>Select a Client</option>
+                                        @foreach (var item in Model.listClients)
+                                        {
+                                            <option value="@item.id">@item.name</option>
+                                        }
+                                    </select>
+                                </div>
+                                <div class="col px-3">
+                                    <p>Check contact(s) to link to the selected client</p>
+                                    @foreach (var item in Model.listContacts)
+                                    {
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" name="linkedContactIds" value="@item.id" id="flexCheckChecked">
+                                            <label class="form-check-label" for="flexCheckChecked">
+                                                @item.surname @item.name
+                                            </label>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary mx-5 float-end">Create Link</button>
+                        </form>
+                    </div>
+                </div>
+
+                <br />
+                
+                <!-- table displaying clients to their linked contacts -->
+                <div class="card">
+                    <div class="card-body">
+                        <h5>List of Clients and their linked Contacts</h5>
+                        <!-- display this message when the table is empty -->
+                        @if (Model.IsTableEmpty)
+                        {
+                            <p class="text-center">No client(s) found.</p>
+                        }
+                        else
+                        {
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>Client Name</th>
+                                        <th>Client Code</th>
+                                        <th>Linked Contact</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model.listClientLinkContacts)
+                                    {
+                                        <tr>
+                                            <td>@item.clientName</td>
+                                            <td>@item.clientCode</td>
+                                            <td>@item.contactSurname @item.contactName</td>
+                                            <td>
+                                                <a class="btn-close" href="/DeleteLinkedContacts?contactId=@item.contactId&clientId=@item.clientId"></a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        }
+                    </div>
+                </div>
+
+                <br />
+
+                <a class="btn btn-outline-primary mx-5 float-end" href="/" role="button">Cancel</a>
+
+            </div>
+        </div>
+    </div>
+</div>

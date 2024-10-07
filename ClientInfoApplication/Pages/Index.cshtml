@@ -1,0 +1,104 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+
+<div class="card ">
+    <!-- main section header tabs -->
+    <div class="card-header">
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="home-tab" data-bs-toggle="tab" data-bs-target="#home-tab-pane" type="button" role="tab" aria-controls="home-tab-pane" aria-selected="true">
+                    <strong>
+                        CLIENTS
+                    </strong>
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile-tab-pane" type="button" role="tab" aria-controls="profile-tab-pane" aria-selected="false">
+                    <strong>
+                        CONTACTS
+                    </strong>
+                </button>
+            </li>
+        </ul>
+    </div>
+    <div class="card-body">
+        <div class="tab-content" id="myTabContent">
+            <!-- Clients Home Tab -->
+            <div class="tab-pane fade show active" id="home-tab-pane" role="tabpanel" aria-labelledby="home-tab" tabindex="0">  
+                <a class="btn btn-primary btn-sm mb-3" href="/Clients">Add New Client</a>
+                @if (Model.IsTableEmptyClients)
+                {
+                    <p class="text-center">No client(s) found.</p>
+                }
+                else
+                {
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Client Code</th>
+                                <th>No. of Linked Contacts</th>
+                                <th>Delete</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach(var item in Model.listClients)
+                            {
+                                <tr>
+                                    <td>@item.name</td>
+                                    <td>@item.clientCode</td>
+                                    <td class="text-center">@item.linkedContacts</td>
+                                    <td>
+                                        <a class="btn-close" href="/DeleteClients?id=@item.id"></a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+            </div>
+
+            <!-- Contacts Home Tab -->
+            <div class="tab-pane fade" id="profile-tab-pane" role="tabpanel" aria-labelledby="profile-tab" tabindex="0">
+                <a class="btn btn-primary btn-sm mb-3" href="/Contacts">Add New Contact</a>
+                @if (Model.IsTableEmptyContacts)
+                {
+                    <p class="text-center">No contact(s) found.</p>
+                }
+                else
+                {
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Surname</th>
+                                <th>Name</th>                     
+                                <th>Email</th>
+                                <th>No. of Linked Clients</th>
+                                <th>Delete</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.listContacts)
+                            {
+                                <tr>
+                                    <td>@item.surname</td>
+                                    <td>@item.name</td>
+                                    <td>@item.email</td>
+                                    <td class="text-center">@item.linkedClients</td>
+                                    <td>
+                                        <a class="btn-close" href="/DeleteContacts?id=@item.id"></a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
